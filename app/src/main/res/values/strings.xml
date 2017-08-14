@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">YouDaoWordBookSpider</string>
+    <string name="word_count">Word Count : %1$d</string>
 </resources>

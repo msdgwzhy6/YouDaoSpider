@@ -12,6 +12,7 @@
         android:id="@+id/et_user_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
         android:textSize="18dp"
         android:hint="用户名"
         />
@@ -21,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18dp"
+        android:inputType="textPassword"
         android:hint="密码"
         />
 

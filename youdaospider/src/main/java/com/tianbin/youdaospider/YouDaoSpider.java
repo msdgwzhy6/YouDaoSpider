@@ -10,11 +10,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -88,6 +90,9 @@ public class YouDaoSpider {
                 .get();
 
         youDaoWordbook.wordCount = getWordCount(document);
+        if (youDaoWordbook.wordCount == 0) {
+            return youDaoWordbook;
+        }
         youDaoWordbook.pageCount = getPageCount(document);
 
         parseWords(youDaoWordbook.pageCount, youDaoWordbook, cookieMap);
@@ -103,6 +108,9 @@ public class YouDaoSpider {
 
     private int getWordCount(Document document) {
         Element wordCountElement = document.getElementById(Constants.ElementId.CARD_MAX_ID);
+        if (wordCountElement == null) {
+            return 0;
+        }
         wordCountElement.childNodes();
         return Integer.parseInt(wordCountElement.childNodes().get(0).toString());
     }
@@ -114,14 +122,21 @@ public class YouDaoSpider {
             return 1;
         }
         for (Node childNode : pageCountElement.childNodes()) {
-            String hrefValue = childNode.attributes().get(Constants.ElementId.HREF);
-            if (hrefValue.isEmpty()) {
-                continue;
-            }
-            String substring = hrefValue.substring(11);
-            int pageNum = Integer.parseInt(substring.split("&")[0]);
-            if (maxPageNum < pageNum) {
-                maxPageNum = pageNum;
+            if (childNode instanceof Element) {
+                final List<Node> nodes = childNode.childNodes();
+                if (nodes.size() > 0) {
+                    final Node node = nodes.get(0);
+                    if (node instanceof TextNode) {
+                        final String wholeText = ((TextNode) node).getWholeText();
+                        if (wholeText.matches("^-?\\d+$")) {
+                            final int pageNum = Integer.parseInt(wholeText);
+                            if (maxPageNum < pageNum) {
+                                maxPageNum = pageNum;
+                            }
+                        }
+                        System.out.println(wholeText);
+                    }
+                }
             }
         }
         return maxPageNum;

@@ -2,12 +2,15 @@ package com.tianbin.youdaowordbookspider;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
 import android.widget.TextView;
 
 import com.tianbin.youdaospider.YouDaoSpider;
@@ -54,6 +57,13 @@ public class WordBookActivity extends AppCompatActivity {
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                super.getItemOffsets(outRect, view, parent, state);
+                outRect.top = dp2px(8);
+            }
+        });
 
         mWordbookAdapter = new WordbookAdapter();
         mRecyclerView.setAdapter(mWordbookAdapter);
@@ -80,7 +90,7 @@ public class WordBookActivity extends AppCompatActivity {
                     @Override
                     public void call(Wordbook wordbook) {
                         if (wordbook != null && wordbook.wordList != null && !wordbook.wordList.isEmpty()) {
-                            mTvWordNum.setText(String.valueOf(wordbook.wordCount));
+                            mTvWordNum.setText(getString(R.string.word_count, wordbook.wordCount));
                             mWordbookAdapter.setNewData(wordbook.wordList);
                         }
                     }
@@ -94,5 +104,9 @@ public class WordBookActivity extends AppCompatActivity {
 
     private String getCookie() {
         return getIntent().getStringExtra(COOKIE);
+    }
+
+    public int dp2px(float dpValue) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, getResources().getDisplayMetrics());
     }
 }
